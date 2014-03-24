@@ -1,0 +1,53 @@
+
+
+apply plugin: 'java'
+apply plugin: 'maven'
+description = 'Otto'
+
+configurations {
+  provided
+}
+
+sourceSets {
+  main.compileClasspath += configurations.provided
+  test.compileClasspath += configurations.provided
+  test.runtimeClasspath += configurations.provided
+}
+
+dependencies {
+  provided 'com.google.android:android:4.4.2'
+}
+
+dependencies {
+  //testCompile group: 'junit', name: 'junit', version:'4.10'
+  //testCompile group: 'org.easytesting', name: 'fest-assert-core', version:'2.0M10'
+  //testCompile group: 'org.robolectric', name: 'robolectric', version:'2.2'
+  //testCompile group: 'com.google.testing.compile', name: 'compile-testing', version:'0.4'
+}
+
+
+ext {
+  artifactId = "otto"
+  artifactVersion = prop( 'versionName' )
+  artifactVersionSuffix = "-SNAPSHOT"
+}
+
+if ( hasProperty( 'ec2Nexus' ) ) {
+  uploadArchives {
+    repositories {
+      mavenDeployer {
+        pom {
+          artifactId = project.artifactId
+          version = "${project.artifactVersion}${project.artifactVersionSuffix}"
+        }
+        repository( url: ec2Nexus ) {
+          authentication( userName: ec2NexusUsername, password: ec2NexusPassword )
+        }
+        snapshotRepository( url: ec2NexusSnapshots ) {
+          authentication( userName: ec2NexusUsername, password: ec2NexusPassword )
+        }
+      }
+    }
+  }
+}
+
